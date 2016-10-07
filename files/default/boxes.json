@@ -1,0 +1,13 @@
+{
+    "name": "bento/centos-5.11",
+    "description": "This box contains CentOS 5.11",
+    "versions": [{
+        "version": "2.2.9",
+        "providers": [{
+                "name": "virtualbox",
+                "url": "http://repodev/vagrant/boxes/bento-centos-5.11.box",
+                "checksum_type": "md5",
+                "checksum": "64413165ca3089fcf73d2467cab8226c"
+        }]
+    }]
+}
