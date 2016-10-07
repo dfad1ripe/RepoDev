@@ -16,9 +16,9 @@ web_app 'web_repo' do
 end
 
 #
-# Install pure-ftpd
+# Install FTP server
 
-include_recipe 'onddo_proftpd'
+include_recipe 'vsftpd'
 
 #
 # Create ftp user

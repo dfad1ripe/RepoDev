@@ -4,6 +4,12 @@
 include_recipe 'selinux::disabled'
 
 #
+# Install additional packages
+package 'unzip' do
+  action :install
+end
+
+#
 # Create user & group for handling repo server
 
 group 'devops' do
@@ -18,6 +24,14 @@ user 'devops' do
   password '$1$nkcLJNGX$lsux6kr9wJ4XJabcyoj3t/'	# devops
   gid 'devops'
 end
+
+directory '/home/devops' do
+  owner 'devops'
+  group 'devops'
+  mode '0700'
+  action :create
+end
+
 
 #
 # Create directory structure for the repo
