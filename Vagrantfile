@@ -83,6 +83,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       'recipe[RepoDev::10_prereqs]',
       'recipe[RepoDev::20_http_ftp]',
       'recipe[RepoDev::21_php]',
+      'recipe[RepoDev::22_perl]',
       'recipe[RepoDev::30_vagrant]',
       'recipe[RepoDev::99_firewall]'
     ]

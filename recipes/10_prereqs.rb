@@ -2,11 +2,14 @@
 # First, disable selinux as the community code for MySQL requires
 
 include_recipe 'selinux::disabled'
+#include_recipe 'cpanminus'
 
 #
 # Install additional packages
-package 'unzip' do
-  action :install
+%w(unzip gcc).each do |pkg|
+  package pkg do
+    action :install
+  end
 end
 
 #
@@ -31,7 +34,6 @@ directory '/home/devops' do
   mode '0700'
   action :create
 end
-
 
 #
 # Create directory structure for the repo
