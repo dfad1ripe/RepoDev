@@ -17,8 +17,8 @@ if ($Config::Config{osname} =~ m/MSWin/) {
   our $Outbox = 'C:/devops/RepoEngine/Outbox/';
   our $TempDir = 'C:/devops/RepoEngine/Temp/';
 } else {
-  our $Inbox = '/opt/repo/Inbox/';
-  our $Outbox = '/opt/repo/www/vagrant/';
+  our $Inbox = "<%= node['Repo']['base_dir'] %>inbox/";
+  our $Outbox = "<%= node['Repo']['web_dir'] %>vagrant/";
   our $TempDir = '/tmp/';
 }
 
@@ -107,7 +107,7 @@ if (scalar @InFiles > 0) {
   $log->info(" Processing $BoxFileName");
   print "Processing $BoxFileName\n";
 
-  # Is it zip or tgz?
+  # Is it either zip or tgz?
   my $IsZip = 0;
   my $IsTgz = 0;
 
@@ -154,8 +154,8 @@ if (scalar @InFiles > 0) {
   $log->debug(" $::command");
   system($::command);
   if ($? == 0) {	# metadata extracted successfully
-    $log->info(" Metadata extracted");
-    print "Metadata extracted\n";
+    $log->info(" Metadata extracted.");
+    print "Metadata extracted.\n";
 
     # Read metadata.json
     open MDATA, '<', ($::TempDir . "metadata.json") or die $!;
@@ -186,7 +186,7 @@ if (scalar @InFiles > 0) {
   }
 
   # Calculate checksum
-  $log->debug(" Calculating SHA1 checksum");
+  $log->debug(" Calculating SHA1 checksum.");
   open BOX, '<', $BoxFileName or die $!;
   my $sha1 = Digest::SHA1->new;
   $sha1->addfile(*BOX);
@@ -195,19 +195,35 @@ if (scalar @InFiles > 0) {
   $log->debug(" SHA1 checksum: $sha1->hexdigest");
   #print (encode_json $::Box, $Cpanel::JSON::XS::allow_nonref) . "\n\n";
 
-  # Merge JSON descriptions
-  $log->debug(" Reading existing JSON catalog");
-  #open JSON, '<', $::Outbox . 'boxes.json' or die "Cannot open boxes.json: $!";
-  #my $OldJSON = <JSON>;
-  #close JSON;
-  $log->debug(" Merging JSON objects");
-  #print "$OldJSON\n";
-  my $DecodedOldJSON = decode_json(read_file($::Outbox . 'boxes.json'));
-  push my @NewCatalog, @{$DecodedOldJSON};
-
   # Move box file to Outbox
+  $log->debug(" Moving the box to web share.");
   my $NewBoxFileName = $::Outbox . 'boxes/'. @InFiles[0];
-  #move($BoxFileName, $NewBoxFileName) or die("Cannot move $BoxFileName to destination $NewBoxFileName: $!");
+  move($BoxFileName, $NewBoxFileName) or die("Cannot move $BoxFileName to destination $NewBoxFileName: $!");
+  $log->debug(" Moved successfully.");
+  $::Box->{'versions'}[0]->{'providers'}[0]->{'url'} = $NewBoxFileName;
+
+  # Merge JSON descriptions
+  $log->debug(" Reading existing JSON catalog.");
+  $log->debug(" Merging JSON objects.");
+  my $DecodedOldJSON = decode_json(read_file($::Outbox . 'boxes.json'));
+  push my @NewCatalog, $DecodedOldJSON;
+  push @NewCatalog, $::Box;
+  my $coder = Cpanel::JSON::XS->new->ascii->pretty->allow_nonref;
+  my $NewJSON = $coder->encode([@NewCatalog]);
+  # print "$NewJSON\n";
+  $log->debug(" JSON objects merged.");
+  $log->debug(" New value: \n$NewJSON.");
+
+  # Write new JSON data to boxes.json
+  write_file($::Outbox . 'boxes.json', $NewJSON) or die "Cannot write boxes.json: $!";
+  $log->debug(" JSON data is written to boxes.json.");
+
+  # Report successful execution
+  $log->info(" $BoxFileName was added successfully.");
+  print "$BoxFileName was added successfully.\n\n";
+} else { 	# no files to analyze in Inbox
+  $log->info(" Inbox is empty, exiting.");
+  print "Inbox is empty, exiting.\n\n";
 }
 
 # Finally, remove the lock.

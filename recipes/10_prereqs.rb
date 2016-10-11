@@ -2,10 +2,11 @@
 # First, disable selinux as the community code for MySQL requires
 
 include_recipe 'selinux::disabled'
-#include_recipe 'cpanminus'
 
 #
 # Install additional packages
+# unzip: to analyze zip files
+# gcc: to build some CPAN Perl modules
 %w(unzip gcc).each do |pkg|
   package pkg do
     action :install
@@ -40,6 +41,13 @@ end
 
 base_dir = node['Repo']['base_dir']
 directory base_dir do
+  owner 'devops'
+  group 'devops'
+  mode '0755'
+  action :create
+end
+
+directory base_dir + 'inbox' do
   owner 'devops'
   group 'devops'
   mode '0755'

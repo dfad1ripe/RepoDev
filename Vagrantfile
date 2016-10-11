@@ -28,7 +28,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
-  config.vm.network "forwarded_port", guest: 80, host: 1180
+  config.vm.network 'forwarded_port', guest: 80, host: 1180
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -38,7 +38,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
   # your network.
-  config.vm.network "public_network"
+  config.vm.network 'public_network'
 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
@@ -82,9 +82,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.run_list = [
       'recipe[RepoDev::10_prereqs]',
       'recipe[RepoDev::20_http_ftp]',
-      'recipe[RepoDev::21_php]',
-      'recipe[RepoDev::22_perl]',
-      'recipe[RepoDev::30_vagrant]',
+      'recipe[RepoDev::30_perl]',
+      'recipe[RepoDev::40_vagrant]',
       'recipe[RepoDev::99_firewall]'
     ]
   end

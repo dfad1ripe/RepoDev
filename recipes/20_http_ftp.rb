@@ -20,9 +20,4 @@ end
 
 include_recipe 'vsftpd'
 
-#
-# Create ftp user
-# pure_ftpd_virtual_user 'my user' do
-#   username node['Repo']['ftp_user']
-#   password node['Repo']['ftp_pass']
-# end
+# TODO: create FTP user
