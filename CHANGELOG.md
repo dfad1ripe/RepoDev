@@ -1,3 +1,7 @@
+# 20161011
+
+First working solution
+
 # 20161010
 
 Added necessary support for Perl & modules, as well as GCC required

@@ -1,3 +1,16 @@
+############################################################
+#
+# Parameters that you might want to change first of all
+#
+
+# External URL of the repository
+default['Repo']['web_prefix'] = 'http://repodev/'
+
+############################################################
+#
+# Parameters that you might want to leave 'as is'
+#
+
 # Base dir
 default['Repo']['base_dir'] = '/opt/repo/'
 

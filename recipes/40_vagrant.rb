@@ -8,7 +8,7 @@ vagrant_dir = node['Repo']['base_dir'] + node['Repo']['web_dir'] +
 # Download initial box to a repo
 
 bash 'Download one real box' do
-  # action :nothing
+  action :nothing
   cwd vagrant_dir + 'boxes/'
   code <<-EOH
     wget -c https://atlas.hashicorp.com/bento/boxes/centos-5.11/versions/2.2.9/providers/virtualbox.box
@@ -21,5 +21,6 @@ end
 # Put initial description
 
 cookbook_file vagrant_dir + 'bento-centos-5.11.json' do
+  action :nothing
   source 'bento-centos-5.11.json'
 end

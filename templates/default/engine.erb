@@ -16,10 +16,12 @@ if ($Config::Config{osname} =~ m/MSWin/) {
   our $Inbox = 'C:/devops/RepoEngine/Inbox/';
   our $Outbox = 'C:/devops/RepoEngine/Outbox/';
   our $TempDir = 'C:/devops/RepoEngine/Temp/';
+  our $UrlPrefix = 'http://repodev/';
 } else {
   our $Inbox = "<%= node['Repo']['base_dir'] %>inbox/";
-  our $Outbox = "<%= node['Repo']['web_dir'] %>vagrant/";
+  our $Outbox = "<%= node['Repo']['base_dir'] %><%= node['Repo']['web_dir'] %>vagrant/";
   our $TempDir = '/tmp/';
+  our $UrlPrefix = "<%= node['Repo']['web_prefix'] %>";
 }
 
 our $BoxDir = $::Outbox . 'boxes/';
@@ -198,25 +200,21 @@ if (scalar @InFiles > 0) {
   # Move box file to Outbox
   $log->debug(" Moving the box to web share.");
   my $NewBoxFileName = $::Outbox . 'boxes/'. @InFiles[0];
+  $log->debug(" Old location: $BoxFileName");
+  $log->debug(" New location: $NewBoxFileName");
   move($BoxFileName, $NewBoxFileName) or die("Cannot move $BoxFileName to destination $NewBoxFileName: $!");
   $log->debug(" Moved successfully.");
-  $::Box->{'versions'}[0]->{'providers'}[0]->{'url'} = $NewBoxFileName;
-
-  # Merge JSON descriptions
-  $log->debug(" Reading existing JSON catalog.");
-  $log->debug(" Merging JSON objects.");
-  my $DecodedOldJSON = decode_json(read_file($::Outbox . 'boxes.json'));
-  push my @NewCatalog, $DecodedOldJSON;
-  push @NewCatalog, $::Box;
-  my $coder = Cpanel::JSON::XS->new->ascii->pretty->allow_nonref;
-  my $NewJSON = $coder->encode([@NewCatalog]);
-  # print "$NewJSON\n";
-  $log->debug(" JSON objects merged.");
-  $log->debug(" New value: \n$NewJSON.");
+  # Generate absolute URL for the box (relative URLs do not work!)
+  $::Box->{'versions'}[0]->{'providers'}[0]->{'url'} =
+          $::UrlPrefix . 'vagrant/boxes/' . @InFiles[0];
 
   # Write new JSON data to boxes.json
-  write_file($::Outbox . 'boxes.json', $NewJSON) or die "Cannot write boxes.json: $!";
-  $log->debug(" JSON data is written to boxes.json.");
+  my $coder = Cpanel::JSON::XS->new->ascii->pretty->allow_nonref;
+  my $NewJSON = $coder->encode($::Box);
+  my $JsonFileName = $::Outbox . $::Box->{'name'} . ".json";
+  write_file($JsonFileName, $NewJSON) or die "Cannot write JSON file: $!";
+  $log->info(" JSON data is written to $JsonFileName.");
+  print "JSON data is written to $JsonFileName.\n";
 
   # Report successful execution
   $log->info(" $BoxFileName was added successfully.");

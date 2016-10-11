@@ -16,6 +16,12 @@ Created and tested on Centos 6.8 only.
     <th>Default</th>
   </tr>
   <tr>
+    <td><tt>['Repo']['web_prefix']</tt></td>
+    <td>String</td>
+    <td>URL prefix of the repository</td>
+    <td><tt>http://repodev/</tt></td>
+  </tr>
+  <tr>
     <td><tt>['Repo']['base_dir']</tt></td>
     <td>String</td>
     <td>Base installation directory</td>
@@ -65,17 +71,22 @@ To use it, specify the following parameter in Vagrantfile:
 - metadata.json is extracted and analyzed if it exists. *Note: In bento boxes that I checked, this file keeps an information about VM provider only. I suppose that this may vary, keep box version etc, but I have not seen other options yet, so did not add other checks.*
 - SHA1 checksum is calculated.
 - The box is moved to web share under Outbox directory.
-- JSON description of the box is added to existing catalog (boxes.json).
+- JSON description of the box is added to web share.
 
 ### Logging and debugging
 
 Log file `engine.log` is created in current working directory.
-The script uses Su::Log module for logging purposes. Default log level is `info`. To get more verbose log output, set `$LogLevel` variable in the script to `debug`.   
+The script uses Su::Log module for logging purposes. Default log level is `info`. To get more verbose log output, set `$LogLevel` variable in the script to `debug`.
+
+*Note: when the script is executed by cron, current working directory is the home directory of corresponding user account, so check `~devops/engine.log` in this case.* 
 
 ## ToDo:
 
-- Add provider specific analysis. Particularly, for VirtualBox, analyze `box.ovf` to extract values for box name and description.
-- Add `syslog` support. *Note: log rotation is not implemented in the script.* 
+- Add provider-specific analysis. Particularly, for VirtualBox, analyze `box.ovf` to extract values for box name and description.
+- Version support for boxes. Not clear at the moment how to define the version through metagata; bento boxes do not seem to provide this info internally. 
+- Add `syslog` support. *Note: log rotation is not implemented in the script. This should be done with OS tools instead.*
+- Add OS-dependent null device (`nul` is used currently, `/dev/null` should be used on Linux instead).
+- Perl `move` function from `File::Copy` module does not provide correct error message if an operation can't be performed.  
 
 ## License and Authors
 
