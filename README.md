@@ -49,15 +49,25 @@ Created and tested on Centos 6.8 only.
 
 ## Usage
 
-JSON data about existing boxes is available at:
-`http://<hostname:port>/vagrant/boxes.json`.
+JSON data about existing boxes is available as:
+`http://<hostname:port>/vagrant/<boxename>.json`.
+
+Each file in this directory represents single box.
 
 To use it, specify the following parameter in Vagrantfile:
-`config.vm.box_url = 'http://<hostname:port>/vagrant/boxes.json'` 
+`config.vm.box_url = 'http://<hostname:port>/vagrant/<boxename>.json'`
+
+An example:
+
+``````
+  config.vm.box = 'mybox-1.0'
+  config.vm.box_url = 'http://myrepository.com:8080/vagrant/mybox-1.0.json'
+``````
+ 
 
 ### A workflow to add new boxes:
 
-1. A box is uploaded to Inbox dir (`['Repo']['base_dir']/Inbox`) by FTP or SCP. 
+1. A box is uploaded to Inbox dir (`['Repo']['base_dir']/inbox`) by FTP or SCP. 
 2. A scheduled task analyzes the box, (archive format, metadata, checksum).
 3. If the analysis was successful, the box is placed to web share by the script, and corresponding JSON data is added.
 
